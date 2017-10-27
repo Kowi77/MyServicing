@@ -1,15 +1,18 @@
-package kov.develop.model;
+package kov.develop.shared;
 
+
+import kov.develop.shared.PointType;
 
 import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
-@Table(schema = "point", name="points")
+@Table(name="points")
 public class Point implements Serializable {
 
     @Id
     @Column(name="id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     @Basic
     @Column(name="country", nullable = false, length = 30)

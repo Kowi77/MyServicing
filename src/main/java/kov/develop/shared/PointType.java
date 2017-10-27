@@ -1,4 +1,4 @@
-package kov.develop.model;
+package kov.develop.shared;
 
 
 public enum PointType {

@@ -2,21 +2,23 @@ package kov.develop.client;
 
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
-import kov.develop.model.Point;
-import kov.develop.model.PointType;
+import kov.develop.shared.Point;
+import kov.develop.shared.PointType;
+import kov.develop.shared.PointResult;
 
 import java.util.List;
 
 @RemoteServiceRelativePath("gwtAppService")
 public interface GwtAppService extends RemoteService {
-    Point gwtAppCallServer(Point data) throws IllegalArgumentException;
 
-    List<Point> getAllPoints();
+    PointResult gwtAppCallServer(Point data) throws IllegalArgumentException;
 
-    List<Point> getAllPointsByType(PointType type);
+    List<PointResult> getAllPoints();
 
-    List<Point> getAllPointsByTypeAndCountry(PointType type, String country);
+    List<PointResult> getAllPointsByType(PointType type);
 
-    Point getPoint(int id);
+    List<PointResult> getAllPointsByTypeAndCountry(PointType type, String country);
+
+    PointResult getPoint(int id);
 
 }

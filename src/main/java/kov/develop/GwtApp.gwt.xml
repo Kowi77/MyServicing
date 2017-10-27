@@ -27,6 +27,7 @@
     <source path='client'/>
     <source path='shared'/>
     <source path='model'/>
+    <!--<source path='server'/>-->
 
     <!-- allow Super Dev Mode -->
     <add-linker name="xsiframe"/>

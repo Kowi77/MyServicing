@@ -38,10 +38,16 @@ h1 {
     margin: 15px 6px 6px;
 }
 
-.helloWidgetPanel {
+.typePanel {
     font-weight:bold;
     color:green;
 }
 .listBoxStyle {
     color: red;
 }
+
+.mainPanel {
+    border: solid;
+    font-size: large;
+}
+
