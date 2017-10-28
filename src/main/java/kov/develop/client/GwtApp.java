@@ -15,10 +15,7 @@ import kov.develop.client.ui.WidgetPanel;
 import kov.develop.shared.PointResult;
 import kov.develop.shared.PointType;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -26,14 +23,14 @@ import java.util.stream.Collectors;
 **/
 public class GwtApp implements EntryPoint {
 
-    final VerticalPanel mainPanel = new VerticalPanel();
-    final HorizontalPanel choicePanel = new HorizontalPanel();
+     VerticalPanel mainPanel = new VerticalPanel();
+    HorizontalPanel choicePanel = new HorizontalPanel();
     List<PointResult> pointsList;
 
 
-    WidgetPanel typePanel;
-    WidgetPanel countryPanel;
-    WidgetPanel sityPanel;
+    public static WidgetPanel typePanel;
+    public static WidgetPanel countryPanel;
+    public static WidgetPanel sityPanel;
 
     private final GwtAppServiceAsync gwtAppService = GWT.create(GwtAppService.class);
 
@@ -98,6 +95,7 @@ public class GwtApp implements EntryPoint {
             @Override
             public void onSuccess(List<PointResult> points) {
                 pointsList = new ArrayList<>(points);
+                RootPanel.get().add(new HTML("%%%%%%%%List" + pointsList.size()));
                 refreshChoicePanel(points);
                 dataProvider.getList().addAll(points);
             }
@@ -110,16 +108,27 @@ public class GwtApp implements EntryPoint {
      */
     public void onModuleLoad() {
 
-        typePanel = new WidgetPanel(Arrays.asList(PointType.values()).stream().map(t -> t.toString()).collect(Collectors.toSet()));
-        choicePanel.setSpacing(5);
-        choicePanel.add(typePanel.getListBox());
+        // Set main elements
         RootPanel.get("choicePanelContainer").add(choicePanel);
+        RootPanel.get("mainPanelContainer").add(mainPanel);
+
+
+
+
+
+
+        //System.out.println(pointsList.size());
+
+        // Initialize choicePanel
+        typePanel = new WidgetPanel(Arrays.asList(PointType.values()).stream().map(t -> t.toString()).collect(Collectors.toSet()));
+        //choicePanel.setSpacing(5);
+        choicePanel.add(typePanel.getListBox());
+
 
         CellTable<PointResult> table = new CellTable<PointResult>();
         ListDataProvider<PointResult> dataProvider = createTable(table);
-
         mainPanel.add(table);
-        RootPanel.get("mainPanelContainer").add(mainPanel);
+
 
 
         typePanel.getListBox().addChangeHandler(new ChangeHandler() {
@@ -131,15 +140,14 @@ public class GwtApp implements EntryPoint {
                              RootPanel.get().add(new HTML(point.getName()));
                      }
                  }
-
             }
         });
     }
 
     public void refreshChoicePanel(List<PointResult> points){
         countryPanel = new WidgetPanel(points.stream().map(p -> p.getCountry()).collect(Collectors.toSet()));
-        choicePanel.add(countryPanel.getListBox());
         sityPanel = new WidgetPanel(points.stream().map(p -> p.getSity()).collect(Collectors.toSet()));
+        choicePanel.add(countryPanel);
         choicePanel.add(sityPanel);
     }
 }
