@@ -28,7 +28,6 @@ public class GwtApp implements EntryPoint {
 
     final VerticalPanel mainPanel = new VerticalPanel();
     final HorizontalPanel choicePanel = new HorizontalPanel();
-    final Label tableName = new Label();
     List<PointResult> pointsList;
 
 
@@ -114,20 +113,13 @@ public class GwtApp implements EntryPoint {
         typePanel = new WidgetPanel(Arrays.asList(PointType.values()).stream().map(t -> t.toString()).collect(Collectors.toSet()));
         choicePanel.setSpacing(5);
         choicePanel.add(typePanel.getListBox());
-        RootPanel.get().add(choicePanel);
-
-        tableName.setText("Список пунктов обслуживания");
-        tableName.setStyleName("tableName");
+        RootPanel.get("choicePanelContainer").add(choicePanel);
 
         CellTable<PointResult> table = new CellTable<PointResult>();
         ListDataProvider<PointResult> dataProvider = createTable(table);
 
         mainPanel.add(table);
-        mainPanel.setStyleName("mainPanel");
-        RootPanel.get().add(tableName);
-
-        RootPanel.get().add(new HTML("<br>"));
-        RootPanel.get().add(mainPanel);
+        RootPanel.get("mainPanelContainer").add(mainPanel);
 
 
         typePanel.getListBox().addChangeHandler(new ChangeHandler() {
