@@ -2,6 +2,10 @@ package kov.develop.client;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -9,35 +13,34 @@ import com.google.gwt.user.client.ui.*;
 import com.google.gwt.view.client.ListDataProvider;
 import kov.develop.client.ui.WidgetPanel;
 import kov.develop.shared.PointResult;
+import kov.develop.shared.PointType;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
-/** Entry point classes define <code>onModuleLoad()</code>. */
+/**
+ *     Entry point class
+**/
 public class GwtApp implements EntryPoint {
 
     final VerticalPanel mainPanel = new VerticalPanel();
-
-    final Button confirmButton = new Button("Confirm");
-    final TextBox countryField = new TextBox();
-    final TextBox sityField = new TextBox();
-    final TextBox adressField = new TextBox();
-    final TextBox nameField = new TextBox();
-    final TextBox phoneField = new TextBox();
-    final TextBox typeField = new TextBox();
-
-    final Label errorLabel = new Label();
+    final HorizontalPanel choicePanel = new HorizontalPanel();
     final Label tableName = new Label();
+    List<PointResult> pointsList;
 
-    VerticalPanel dialogVPanel = new VerticalPanel();
-    final DialogBox dialogBox = new DialogBox();
-    final HTML serverResponseHtml = new HTML();
-    final Label sendToServerLabel = new Label();
-    final Button closeButton = new Button("Close");
+
+    WidgetPanel typePanel;
+    WidgetPanel countryPanel;
+    WidgetPanel sityPanel;
 
     private final GwtAppServiceAsync gwtAppService = GWT.create(GwtAppService.class);
 
     /**
      * Create table with dynamic loading data
+     *
      * @param table base widget.
      * @return data provider.
      */
@@ -90,34 +93,31 @@ public class GwtApp implements EntryPoint {
         this.gwtAppService.getAllPoints(new AsyncCallback<List<PointResult>>() {
             @Override
             public void onFailure(Throwable throwable) {
-                GWT.log("error!!", throwable);
+                GWT.log("Ошибка при загрузке списка", throwable);
             }
 
             @Override
-            public void onSuccess(List<PointResult> point) {
-                dataProvider.getList().addAll(point);
+            public void onSuccess(List<PointResult> points) {
+                pointsList = new ArrayList<>(points);
+                refreshChoicePanel(points);
+                dataProvider.getList().addAll(points);
             }
         });
         return dataProvider;
     }
 
-    /** This is the entry point method.*/
+    /**
+     * This is the entry point method.
+     */
     public void onModuleLoad() {
-        /*
-        Виджет и биндер
-         */
-       /* Binder helloWorld = new Binder();
-        helloWorld.setName("World (div element)");
-        RootPanel.getBodyElement().appendChild(helloWorld.getElement());*/
 
-        WidgetPanel typePanel = new WidgetPanel("Отправка", "Выдача", "Отправка и выдача");
-        typePanel.setStyleName("typePanel");
-        typePanel.getListBox().setStyleName("listBoxStyle");
-
-        RootPanel.get().add(typePanel);
-
+        typePanel = new WidgetPanel(Arrays.asList(PointType.values()).stream().map(t -> t.toString()).collect(Collectors.toSet()));
+        choicePanel.setSpacing(5);
+        choicePanel.add(typePanel.getListBox());
+        RootPanel.get().add(choicePanel);
 
         tableName.setText("Список пунктов обслуживания");
+        tableName.setStyleName("tableName");
 
         CellTable<PointResult> table = new CellTable<PointResult>();
         ListDataProvider<PointResult> dataProvider = createTable(table);
@@ -125,39 +125,40 @@ public class GwtApp implements EntryPoint {
         mainPanel.add(table);
         mainPanel.setStyleName("mainPanel");
         RootPanel.get().add(tableName);
+
+        RootPanel.get().add(new HTML("<br>"));
         RootPanel.get().add(mainPanel);
 
-        /*final Label countryLabel = new Label();
-        countryLabel.setText("country: ");
-        final Label sityLabel = new Label();
-        sityLabel.setText("sity: ");
-        final Label adressLabel = new Label();
-        adressLabel.setText("adress: ");
-        final Label nameLabel = new Label();
-        nameLabel.setText("name: ");
-        final Label phoneLabel = new Label();
-        phoneLabel.setText("phone: ");
-        final Label typeLabel = new Label();
-        typeLabel.setText("type: ");
-        *//*Связываем id='' на html странице с компонентами *//*
-        RootPanel.get("helloId").add(helloLabel);
 
-        RootPanel.get("countryLabelId").add(countryLabel);
-        RootPanel.get("countryId").add(countryField);
-        RootPanel.get("sityLabelId").add(sityLabel);
-        RootPanel.get("sityId").add(sityField);
-        RootPanel.get("adressLabelId").add(adressLabel);
-        RootPanel.get("adressId").add(adressField);
-        RootPanel.get("nameLabelId").add(nameLabel);
-        RootPanel.get("nameId").add(nameField);
-        RootPanel.get("phoneLabelId").add(phoneLabel);
-        RootPanel.get("phoneId").add(phoneField);
-        RootPanel.get("typeLabelId").add(typeLabel);
-        RootPanel.get("typeId").add(typeField);
+        typePanel.getListBox().addChangeHandler(new ChangeHandler() {
+            @Override
+            public void onChange(ChangeEvent event) {
+                 if (!typePanel.getListBox().getSelectedItemText().equals("")){
+                     for (PointResult point : pointsList) {
+                         if (point.getType().toString().equals(typePanel.getListBox().getSelectedItemText()))
+                             RootPanel.get().add(new HTML(point.getName()));
+                     }
+                 }
 
-        RootPanel.get("confirmButtonId").add(confirmButton);
-        RootPanel.get("errorLabelContainer").add(errorLabel);
+            }
+        });
+    }
 
+    public void refreshChoicePanel(List<PointResult> points){
+        countryPanel = new WidgetPanel(points.stream().map(p -> p.getCountry()).collect(Collectors.toSet()));
+        choicePanel.add(countryPanel.getListBox());
+        sityPanel = new WidgetPanel(points.stream().map(p -> p.getSity()).collect(Collectors.toSet()));
+        choicePanel.add(sityPanel);
+    }
+}
+
+
+
+
+
+
+
+        /*
         // Create the popup dialog box
         dialogBox.setText("Remote procedure call from server");
         dialogBox.setAnimationEnabled(true);
@@ -249,9 +250,3 @@ public class GwtApp implements EntryPoint {
                 closeButton.setFocus(true);
             }
         });*/
-
-
-
-    }
-
-}

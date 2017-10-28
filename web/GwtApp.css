@@ -33,21 +33,17 @@ h1 {
     color: red;
 }
 
-/** Set ids using widget.getElement().setId("idOfElement") */
 #closeButton {
     margin: 15px 6px 6px;
 }
 
-.typePanel {
-    font-weight:bold;
-    color:green;
-}
-.listBoxStyle {
-    color: red;
-}
-
 .mainPanel {
     border: solid;
-    font-size: large;
+    border-radius: 10px;
+    font-size: 25px;
+}
+
+.tableName{
+    font-size: 30px;
 }
 

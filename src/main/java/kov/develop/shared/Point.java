@@ -1,18 +1,22 @@
 package kov.develop.shared;
 
-
-import kov.develop.shared.PointType;
-
 import javax.persistence.*;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 import java.io.Serializable;
 
+/**
+ * Entity and Xml class
+ */
 @Entity
 @Table(name="points")
+@XmlRootElement(name="point")
+@XmlType(propOrder = {"id", "country", "sity", "adress", "name", "phone", "type"})
 public class Point implements Serializable {
 
     @Id
     @Column(name="id", nullable = false)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
     @Basic
     @Column(name="country", nullable = false, length = 30)

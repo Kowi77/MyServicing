@@ -27,8 +27,7 @@
        <!-- <property name="hibernate.hbm2ddl.auto" value="create"/>-->
 
         <!-- ЭТИ СТРОЧКИ ПРОПАДУТ ПОСЛЕ АВТОГЕНЕРАЦИИ МАППИНГА НИЖЕ -->
-    <!--    <property name="connection.username">root</property>
-        <property name="connection.password">admin</property>-->
+    <!--    <property name="connection.username">root</property>-->
         <property name="hibernate.connection.driver_class">org.hsqldb.jdbcDriver</property>
         <property name="hibernate.connection.url">jdbc:hsqldb:mem:points;shutdown=false</property>
         <property name="hibernate.connection.username">sa</property><!-- default username -->

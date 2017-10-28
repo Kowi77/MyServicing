@@ -3,7 +3,7 @@
              xmlns:g='urn:import:com.google.gwt.user.client.ui'>
 
     <g:HTMLPanel>
-        Hello, <g:ListBox ui:field='listBox' visibleItemCount='1'/>.
+        <g:ListBox ui:field='listBox' visibleItemCount='1'/>.
     </g:HTMLPanel>
 
 </ui:UiBinder>

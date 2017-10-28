@@ -2,7 +2,7 @@
              xmlns:g='urn:import:com.google.gwt.user.client.ui'>
 
     <div>
-        Hello, <span ui:field="nameSpan" style=""/>
+        <span ui:field="nameSpan" style=""/>
     </div>
 
 </ui:UiBinder>

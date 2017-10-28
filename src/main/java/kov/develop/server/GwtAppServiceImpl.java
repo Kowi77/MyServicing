@@ -8,16 +8,29 @@ import kov.develop.shared.FieldValidator;
 import kov.develop.shared.PointResult;
 import kov.develop.shared.PointType;
 
+import java.io.File;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class GwtAppServiceImpl extends RemoteServiceServlet implements GwtAppService {
 
     private PointRepository repository;
+    private static long lastModified;
+    /*private static Thread loader;*/
+
+    {
+
+    }
 
     public GwtAppServiceImpl() {
         this.repository = new PointRepository();
+        PointRepository.readAllFromXml("E:\\Java\\Servicing\\src\\main\\resources\\point.xml");
+        lastModified = new File("E:\\Java\\Servicing\\src\\main\\resources\\point.xml").lastModified();
+        loader.setDaemon(true);
+        loader.start();
     }
+
 
     public List<PointResult> getAllPoints() {
         return repository.getAllPoints().stream().map(p -> new PointResult(p)).collect(Collectors.toList());
@@ -42,22 +55,23 @@ public class GwtAppServiceImpl extends RemoteServiceServlet implements GwtAppSer
 
         PointResult pointResult = new PointResult(point);
         return pointResult;
-       /* String serverInfo = getServletContext().getServerInfo();
-        String userAgent = getThreadLocalRequest().getHeader("User-Agent");
-
-        data = escapeHtml(data);
-        userAgent = escapeHtml(userAgent);
-
-        return "Привет, " + data + "!<br> Инфо сервера: " + serverInfo + ".<br> Вы используете:" +
-                "<br>" + userAgent;
     }
 
-    private String escapeHtml(String html) {
-        if (html == null) {
-            return null;
+    Thread loader = new Thread(new Runnable() {
+        @Override
+        public void run() {
+            while (true) {
+                if (new File("E:\\Java\\Servicing\\src\\main\\resources\\point.xml").lastModified() > lastModified) {
+                    PointRepository.readAllFromXml("E:\\Java\\Servicing\\src\\main\\resources\\point.xml");
+                    lastModified = new File("E:\\Java\\Servicing\\src\\main\\resources\\point.xml").lastModified();
+                }
+                System.out.println(new File("E:\\Java\\Servicing\\src\\main\\resources\\point.xml").lastModified());
+                try {
+                    Thread.sleep(10000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
         }
-        return html.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(
-                ">", "&gt;");
-    }*/
-    }
+    });
 }
