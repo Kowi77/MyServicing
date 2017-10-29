@@ -40,8 +40,8 @@ public class GwtAppServiceImpl extends RemoteServiceServlet implements GwtAppSer
         return repository.getAllPointsByType(type).stream().map(p -> new PointResult(p)).collect(Collectors.toList());
     }
 
-    public List<PointResult> getAllPointsByTypeAndCountry(PointType type, String country) {
-        return repository.getAllPointsByTypeAndCountry(type, country).stream().map(p -> new PointResult(p)).collect(Collectors.toList());
+    public List<PointResult> getAllPointsByTypeAndCountry(String type, String country) {
+        return repository.getAllPointsByTypeAndCountry(type.equals("")? null : PointType.valueOf(type), country).stream().map(p -> new PointResult(p)).collect(Collectors.toList());
     }
 
     public PointResult getPoint(int id) {

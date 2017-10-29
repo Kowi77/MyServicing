@@ -15,7 +15,7 @@ public interface GwtAppServiceAsync {
 
     void getAllPointsByType(PointType type, AsyncCallback<List<PointResult>> async);
 
-    void getAllPointsByTypeAndCountry(PointType type, String country, AsyncCallback<List<PointResult>> async);
+    void getAllPointsByTypeAndCountry(String type, String country, AsyncCallback<List<PointResult>> async);
 
     void getPoint(int id, AsyncCallback<PointResult> async);
 }

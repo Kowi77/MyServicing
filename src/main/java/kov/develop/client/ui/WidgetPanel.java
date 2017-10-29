@@ -24,10 +24,18 @@ public class WidgetPanel extends Composite {
     public WidgetPanel(Set<String> names) {
         // sets listBox
         initWidget(uiBinder.createAndBindUi(this));
+        refreshPanel(names);
+    }
+
+    public void refreshPanel(Set<String> names) {
+        String item = listBox.getSelectedItemText();
+        listBox.clear();
         listBox.addItem("");
+
         for (String name : names) {
             listBox.addItem(name);
-            System.out.println(name);
+            if (name.equals(item))
+                listBox.setItemSelected(listBox.getItemCount() - 1, true);
         }
     }
 

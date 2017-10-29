@@ -17,7 +17,7 @@ public interface GwtAppService extends RemoteService {
 
     List<PointResult> getAllPointsByType(PointType type);
 
-    List<PointResult> getAllPointsByTypeAndCountry(PointType type, String country);
+    List<PointResult> getAllPointsByTypeAndCountry(String type, String country);
 
     PointResult getPoint(int id);
 
