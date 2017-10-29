@@ -12,6 +12,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.*;
 import com.google.gwt.view.client.ListDataProvider;
 import kov.develop.client.ui.WidgetPanel;
+import kov.develop.shared.Point;
 import kov.develop.shared.PointResult;
 import kov.develop.shared.PointType;
 
@@ -23,24 +24,23 @@ import java.util.stream.Collectors;
 **/
 public class GwtApp implements EntryPoint {
 
-     VerticalPanel mainPanel = new VerticalPanel();
-    HorizontalPanel choicePanel = new HorizontalPanel();
-    List<PointResult> pointsList;
-
-
-    public static WidgetPanel typePanel;
-    public static WidgetPanel countryPanel;
-    public static WidgetPanel sityPanel;
+    //Main Table Panel
+    final VerticalPanel mainPanel = new VerticalPanel();
+    //Choice Panel
+    final HorizontalPanel choicePanel = new HorizontalPanel();
+    //Cache data
+    List<PointResult> pointsList ;
+    //Type of point menu
+    final WidgetPanel typePanel = new WidgetPanel(Arrays.asList(PointType.values()).stream().map(t -> t.toString()).collect(Collectors.toSet()));
+    //Country menu
+    WidgetPanel countryPanel;
+    //sity menu
+    WidgetPanel sityPanel;
 
     private final GwtAppServiceAsync gwtAppService = GWT.create(GwtAppService.class);
 
-    /**
-     * Create table with dynamic loading data
-     *
-     * @param table base widget.
-     * @return data provider.
-     */
-    private ListDataProvider<PointResult> createTable(CellTable<PointResult> table) {
+    //Create main table with dynamic loading data
+    private ListDataProvider<PointResult> createFullTable(CellTable<PointResult> table) {
         TextColumn<PointResult> countryColumn = new TextColumn<PointResult>() {
             @Override
             public String getValue(PointResult point) {
@@ -96,7 +96,70 @@ public class GwtApp implements EntryPoint {
             public void onSuccess(List<PointResult> points) {
                 pointsList = new ArrayList<>(points);
                 RootPanel.get().add(new HTML("%%%%%%%%List" + pointsList.size()));
-                refreshChoicePanel(points);
+                //refreshChoicePanel(points);
+                dataProvider.getList().addAll(points);
+            }
+        });
+        return dataProvider;
+    }
+
+    //Create main table with dynamic loading data by type
+    private ListDataProvider<PointResult> createTableByType(PointType type, CellTable<PointResult> table) {
+        TextColumn<PointResult> countryColumn = new TextColumn<PointResult>() {
+            @Override
+            public String getValue(PointResult point) {
+                return point.getCountry();
+            }
+        };
+        TextColumn<PointResult> sityColumn = new TextColumn<PointResult>() {
+            @Override
+            public String getValue(PointResult point) {
+                return point.getSity();
+            }
+        };
+        TextColumn<PointResult> adressColumn = new TextColumn<PointResult>() {
+            @Override
+            public String getValue(PointResult point) {
+                return point.getAdress();
+            }
+        };
+        TextColumn<PointResult> nameColumn = new TextColumn<PointResult>() {
+            @Override
+            public String getValue(PointResult point) {
+                return point.getName();
+            }
+        };
+        TextColumn<PointResult> phoneColumn = new TextColumn<PointResult>() {
+            @Override
+            public String getValue(PointResult point) {
+                return point.getPhone();
+            }
+        };
+        TextColumn<PointResult> typeColumn = new TextColumn<PointResult>() {
+            @Override
+            public String getValue(PointResult point) {
+                return point.getType().toString();
+            }
+        };
+        table.addColumn(countryColumn, "Страна");
+        table.addColumn(sityColumn, "Город");
+        table.addColumn(adressColumn, "Адрес");
+        table.addColumn(nameColumn, "Имя");
+        table.addColumn(phoneColumn, "Телефон");
+        table.addColumn(typeColumn, "Услуги");
+        ListDataProvider<PointResult> dataProvider = new ListDataProvider<PointResult>();
+        dataProvider.addDataDisplay(table);
+
+        this.gwtAppService.getAllPointsByType(type, new AsyncCallback<List<PointResult>>() {
+            @Override
+            public void onFailure(Throwable throwable) {
+                GWT.log("Ошибка при загрузке списка", throwable);
+            }
+
+            @Override
+            public void onSuccess(List<PointResult> points) {
+               /* pointsList = new ArrayList<>(points);
+                RootPanel.get().add(new HTML("----------List" + pointsList.size()));*/
                 dataProvider.getList().addAll(points);
             }
         });
@@ -112,44 +175,62 @@ public class GwtApp implements EntryPoint {
         RootPanel.get("choicePanelContainer").add(choicePanel);
         RootPanel.get("mainPanelContainer").add(mainPanel);
 
-
-
-
-
-
-        //System.out.println(pointsList.size());
-
-        // Initialize choicePanel
-        typePanel = new WidgetPanel(Arrays.asList(PointType.values()).stream().map(t -> t.toString()).collect(Collectors.toSet()));
-        //choicePanel.setSpacing(5);
-        choicePanel.add(typePanel.getListBox());
-
-
+        // Fill table
         CellTable<PointResult> table = new CellTable<PointResult>();
-        ListDataProvider<PointResult> dataProvider = createTable(table);
+        ListDataProvider<PointResult> dataProvider = createFullTable(table);
         mainPanel.add(table);
+
+        // Fill choicePanel
+        choicePanel.setSpacing(5);
+        choicePanel.add(typePanel.getListBox());
+        /*countryPanel = new WidgetPanel(pointsList.stream().map(p -> p.getCountry()).collect(Collectors.toSet()));
+        sityPanel = new WidgetPanel(pointsList.stream().map(p -> p.getSity()).collect(Collectors.toSet()));
+        choicePanel.add(countryPanel);
+        choicePanel.add(sityPanel);*/
 
 
 
         typePanel.getListBox().addChangeHandler(new ChangeHandler() {
             @Override
             public void onChange(ChangeEvent event) {
-                 if (!typePanel.getListBox().getSelectedItemText().equals("")){
+                PointType type =  PointType.valueOf(typePanel.getListBox().getSelectedItemText());
+                if (!type.toString().equals("")){
                      for (PointResult point : pointsList) {
                          if (point.getType().toString().equals(typePanel.getListBox().getSelectedItemText()))
                              RootPanel.get().add(new HTML(point.getName()));
                      }
+                    List<PointResult> list = pointsList.stream().filter(p -> p.getType().equals(type)).collect(Collectors.toList());
+                    RootPanel.get().add(new HTML(list.stream().map(p -> p.getCountry()).collect(Collectors.toSet()).toString()));
+
+                   // choicePanel.remove(countryPanel.getListBox());
+                   // choicePanel.remove(sityPanel.getListBox());
+                    countryPanel = new WidgetPanel(list.stream().map(p -> p.getCountry()).collect(Collectors.toSet()));
+                    sityPanel = new WidgetPanel(list.stream().map(p -> p.getSity()).collect(Collectors.toSet()));
+                    choicePanel.add(countryPanel.getListBox());
+                    choicePanel.add(sityPanel.getListBox());
+                    mainPanel.clear();
+                    CellTable<PointResult> table = new CellTable<PointResult>();
+                    ListDataProvider<PointResult> dataProvider = createTableByType(type, table);
+                    mainPanel.add(table);
                  }
+            }
+        });
+        countryPanel.getListBox().addChangeHandler(new ChangeHandler() {
+            @Override
+            public void onChange(ChangeEvent event) {
+                   RootPanel.get().add(new HTML("Hello world!"));
             }
         });
     }
 
-    public void refreshChoicePanel(List<PointResult> points){
+
+
+    /*public void refreshChoicePanel(List<PointResult> points){
         countryPanel = new WidgetPanel(points.stream().map(p -> p.getCountry()).collect(Collectors.toSet()));
         sityPanel = new WidgetPanel(points.stream().map(p -> p.getSity()).collect(Collectors.toSet()));
         choicePanel.add(countryPanel);
         choicePanel.add(sityPanel);
-    }
+    }*/
 }
 
 

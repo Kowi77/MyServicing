@@ -36,12 +36,12 @@ public class PointRepository implements Serializable {
 
     public List<Point> getAllPointsByType(PointType type) {
         this.session = sessionFactory.openSession();
-        return session.createCriteria(Point.class).add(Restrictions.like("type", type.toString())).list();
+        return session.createCriteria(Point.class).add(Restrictions.like("type", type)).list();
     }
 
     public List<Point> getAllPointsByTypeAndCountry(PointType type, String country) {
         this.session = sessionFactory.openSession();
-        return session.createCriteria(Point.class).add(Restrictions.like("type", type.toString()))
+        return session.createCriteria(Point.class).add(Restrictions.like("type", type))
                 .add(Restrictions.like("country", country)).list();
     }
 
