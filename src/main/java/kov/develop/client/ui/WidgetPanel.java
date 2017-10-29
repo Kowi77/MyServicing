@@ -34,5 +34,6 @@ public class WidgetPanel extends Composite {
     public ListBox getListBox() {
         return listBox;
     }
+
 }
 

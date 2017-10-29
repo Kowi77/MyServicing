@@ -39,53 +39,8 @@ public class GwtApp implements EntryPoint {
 
     private final GwtAppServiceAsync gwtAppService = GWT.create(GwtAppService.class);
 
-    //Create main table with dynamic loading data
-    private ListDataProvider<PointResult> createFullTable(CellTable<PointResult> table) {
-        TextColumn<PointResult> countryColumn = new TextColumn<PointResult>() {
-            @Override
-            public String getValue(PointResult point) {
-                return point.getCountry();
-            }
-        };
-        TextColumn<PointResult> sityColumn = new TextColumn<PointResult>() {
-            @Override
-            public String getValue(PointResult point) {
-                return point.getSity();
-            }
-        };
-        TextColumn<PointResult> adressColumn = new TextColumn<PointResult>() {
-            @Override
-            public String getValue(PointResult point) {
-                return point.getAdress();
-            }
-        };
-        TextColumn<PointResult> nameColumn = new TextColumn<PointResult>() {
-            @Override
-            public String getValue(PointResult point) {
-                return point.getName();
-            }
-        };
-        TextColumn<PointResult> phoneColumn = new TextColumn<PointResult>() {
-            @Override
-            public String getValue(PointResult point) {
-                return point.getPhone();
-            }
-        };
-        TextColumn<PointResult> typeColumn = new TextColumn<PointResult>() {
-            @Override
-            public String getValue(PointResult point) {
-                return point.getType().toString();
-            }
-        };
-        table.addColumn(countryColumn, "Страна");
-        table.addColumn(sityColumn, "Город");
-        table.addColumn(adressColumn, "Адрес");
-        table.addColumn(nameColumn, "Имя");
-        table.addColumn(phoneColumn, "Телефон");
-        table.addColumn(typeColumn, "Услуги");
-        ListDataProvider<PointResult> dataProvider = new ListDataProvider<PointResult>();
-        dataProvider.addDataDisplay(table);
-
+    //Fill table with dynamic loading data
+    private ListDataProvider<PointResult> fillTable(ListDataProvider<PointResult> dataProvider) {
         this.gwtAppService.getAllPoints(new AsyncCallback<List<PointResult>>() {
             @Override
             public void onFailure(Throwable throwable) {
@@ -95,61 +50,14 @@ public class GwtApp implements EntryPoint {
             @Override
             public void onSuccess(List<PointResult> points) {
                 pointsList = new ArrayList<>(points);
-                RootPanel.get().add(new HTML("%%%%%%%%List" + pointsList.size()));
-                //refreshChoicePanel(points);
                 dataProvider.getList().addAll(points);
             }
         });
         return dataProvider;
     }
 
-    //Create main table with dynamic loading data by type
-    private ListDataProvider<PointResult> createTableByType(PointType type, CellTable<PointResult> table) {
-        TextColumn<PointResult> countryColumn = new TextColumn<PointResult>() {
-            @Override
-            public String getValue(PointResult point) {
-                return point.getCountry();
-            }
-        };
-        TextColumn<PointResult> sityColumn = new TextColumn<PointResult>() {
-            @Override
-            public String getValue(PointResult point) {
-                return point.getSity();
-            }
-        };
-        TextColumn<PointResult> adressColumn = new TextColumn<PointResult>() {
-            @Override
-            public String getValue(PointResult point) {
-                return point.getAdress();
-            }
-        };
-        TextColumn<PointResult> nameColumn = new TextColumn<PointResult>() {
-            @Override
-            public String getValue(PointResult point) {
-                return point.getName();
-            }
-        };
-        TextColumn<PointResult> phoneColumn = new TextColumn<PointResult>() {
-            @Override
-            public String getValue(PointResult point) {
-                return point.getPhone();
-            }
-        };
-        TextColumn<PointResult> typeColumn = new TextColumn<PointResult>() {
-            @Override
-            public String getValue(PointResult point) {
-                return point.getType().toString();
-            }
-        };
-        table.addColumn(countryColumn, "Страна");
-        table.addColumn(sityColumn, "Город");
-        table.addColumn(adressColumn, "Адрес");
-        table.addColumn(nameColumn, "Имя");
-        table.addColumn(phoneColumn, "Телефон");
-        table.addColumn(typeColumn, "Услуги");
-        ListDataProvider<PointResult> dataProvider = new ListDataProvider<PointResult>();
-        dataProvider.addDataDisplay(table);
-
+    //Fill table with dynamic loading data by type
+    private ListDataProvider<PointResult> fillTableByType(PointType type, ListDataProvider<PointResult> dataProvider) {
         this.gwtAppService.getAllPointsByType(type, new AsyncCallback<List<PointResult>>() {
             @Override
             public void onFailure(Throwable throwable) {
@@ -158,8 +66,6 @@ public class GwtApp implements EntryPoint {
 
             @Override
             public void onSuccess(List<PointResult> points) {
-               /* pointsList = new ArrayList<>(points);
-                RootPanel.get().add(new HTML("----------List" + pointsList.size()));*/
                 dataProvider.getList().addAll(points);
             }
         });
@@ -175,18 +81,17 @@ public class GwtApp implements EntryPoint {
         RootPanel.get("choicePanelContainer").add(choicePanel);
         RootPanel.get("mainPanelContainer").add(mainPanel);
 
-        // Fill table
+        // Create table
         CellTable<PointResult> table = new CellTable<PointResult>();
-        ListDataProvider<PointResult> dataProvider = createFullTable(table);
+        ListDataProvider<PointResult> dataProvider = GwtUtil.createTable(table);
+
+        //Fill table
+        fillTable(dataProvider);
         mainPanel.add(table);
 
         // Fill choicePanel
         choicePanel.setSpacing(5);
         choicePanel.add(typePanel.getListBox());
-        /*countryPanel = new WidgetPanel(pointsList.stream().map(p -> p.getCountry()).collect(Collectors.toSet()));
-        sityPanel = new WidgetPanel(pointsList.stream().map(p -> p.getSity()).collect(Collectors.toSet()));
-        choicePanel.add(countryPanel);
-        choicePanel.add(sityPanel);*/
 
 
 
@@ -204,13 +109,16 @@ public class GwtApp implements EntryPoint {
 
                    // choicePanel.remove(countryPanel.getListBox());
                    // choicePanel.remove(sityPanel.getListBox());
-                    countryPanel = new WidgetPanel(list.stream().map(p -> p.getCountry()).collect(Collectors.toSet()));
+              /*      countryPanel = new WidgetPanel(list.stream().map(p -> p.getCountry()).collect(Collectors.toSet()));
                     sityPanel = new WidgetPanel(list.stream().map(p -> p.getSity()).collect(Collectors.toSet()));
                     choicePanel.add(countryPanel.getListBox());
-                    choicePanel.add(sityPanel.getListBox());
+                    choicePanel.add(sityPanel.getListBox());*/
+                    refreshChoicePanel(list);
                     mainPanel.clear();
                     CellTable<PointResult> table = new CellTable<PointResult>();
-                    ListDataProvider<PointResult> dataProvider = createTableByType(type, table);
+                    ListDataProvider<PointResult> dataProvider = GwtUtil.createTable(table);
+                    //Fill table
+                    fillTableByType(type, dataProvider);
                     mainPanel.add(table);
                  }
             }
@@ -225,109 +133,15 @@ public class GwtApp implements EntryPoint {
 
 
 
-    /*public void refreshChoicePanel(List<PointResult> points){
+    public void refreshChoicePanel(List<PointResult> points){
+        choicePanel.clear();
+        choicePanel.add(typePanel.getListBox());
+        if (typePanel.getListBox().getSelectedItemText().equals(""))
+            return;
         countryPanel = new WidgetPanel(points.stream().map(p -> p.getCountry()).collect(Collectors.toSet()));
         sityPanel = new WidgetPanel(points.stream().map(p -> p.getSity()).collect(Collectors.toSet()));
         choicePanel.add(countryPanel);
         choicePanel.add(sityPanel);
-    }*/
+    }
 }
 
-
-
-
-
-
-
-        /*
-        // Create the popup dialog box
-        dialogBox.setText("Remote procedure call from server");
-        dialogBox.setAnimationEnabled(true);
-
-        closeButton.getElement().setId("closeButtonId");
-
-        dialogVPanel.addStyleName("dialogVPanel");
-        dialogVPanel.add(new HTML("<b>Отправленные поля на сервер:</b>"));
-        dialogVPanel.add(sendToServerLabel);
-        dialogVPanel.add(new HTML("<br><b>Ответ сервера:</b>"));
-        dialogVPanel.add(serverResponseHtml);
-        dialogVPanel.setHorizontalAlignment(VerticalPanel.ALIGN_RIGHT);
-        dialogVPanel.add(closeButton);
-        dialogBox.setWidget(dialogVPanel);
-
-        //обработчик для клика по кнопке 'Confirm'
-        confirmButton.addClickHandler(new ClickHandler() {
-            public void onClick(ClickEvent event) {
-                confirmButton.setEnabled(false);
-                sendInfoToServer();
-            }
-        });
-
-        //обработчик по нажатию enter в текстовом поле
-        nameField.addKeyUpHandler(new KeyUpHandler() {
-            public void onKeyUp(KeyUpEvent event) {
-                if(event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
-                    sendInfoToServer();
-                }
-            }
-        });
-        //обработчик по клику на кнопку 'Close' в диалоговом окне
-        closeButton.addClickHandler(new ClickHandler() {
-            public void onClick(ClickEvent event) {
-                dialogBox.hide();
-                confirmButton.setEnabled(true);
-                confirmButton.setFocus(true);
-            }
-        });
-    }*/
-
-/*    private void sendInfoToServer() {
-        //validate input text
-        errorLabel.setText("");
-        final Point[] point = {new Point()};
-        gwtAppService.getAllPoints(new AsyncCallback<List<Point>>() {
-            @Override
-            public void onFailure(Throwable caught) {
-                dialogBox.setText("Remote Procedure Call - Failure");
-                serverResponseHtml.addStyleName("serverResponseLabelError");
-                serverResponseHtml.setHTML("ERROR ON GET_ALL");
-                dialogBox.center();
-                closeButton.setFocus(true);
-            }
-
-            @Override
-            public void onSuccess(List<Point> result) {
-                point[0] = result.get(0);
-            }
-        });
-        *//*Point point = new Point();
-        point.setCountry(countryField.getText());
-        point.setSity(sityField.getText());
-        point.setAdress(adressField.getText());
-        point.setName(nameField.getText());
-        point.setPhone(phoneField.getText());*//*
-       *//* point.setType(typeField.getElement());*//*
-
-        if (!FieldValidator.isValidData(point[0].getName())) { //отобразить ошибку на html странице
-            errorLabel.setText("Имя должно содержать больше трех символов");
-            return;
-        }
-        sendToServerLabel.setText(point[0].toString());
-        confirmButton.setEnabled(false);
-        serverResponseHtml.setText("");
-        gwtAppService.gwtAppCallServer(point[0], new AsyncCallback<Point>() {
-            public void onFailure(Throwable caught) {
-                dialogBox.setText("Remote Procedure Call - Failure");
-                serverResponseHtml.addStyleName("serverResponseLabelError");
-                serverResponseHtml.setHTML("ERROR ON SERVER");
-                dialogBox.center();
-                closeButton.setFocus(true);
-            }
-            public void onSuccess(Point pointResult) {
-                dialogBox.setText("Remote Procedure Call");
-                serverResponseHtml.removeStyleName("serverResponseLabelError");
-                serverResponseHtml.setHTML(pointResult.toString());
-                dialogBox.center();
-                closeButton.setFocus(true);
-            }
-        });*/
