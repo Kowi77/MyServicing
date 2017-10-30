@@ -11,13 +11,13 @@ import java.util.List;
 @RemoteServiceRelativePath("gwtAppService")
 public interface GwtAppService extends RemoteService {
 
-    PointResult gwtAppCallServer(Point data) throws IllegalArgumentException;
-
     List<PointResult> getAllPoints();
 
     List<PointResult> getAllPointsByType(PointType type);
 
     List<PointResult> getAllPointsByTypeAndCountry(String type, String country);
+
+    List<PointResult> getAllPointsByTypeAndCountryAndSity(String type, String country, String sity);
 
     PointResult getPoint(int id);
 

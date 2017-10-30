@@ -50,15 +50,10 @@ public class XmlServiceImpl implements XmlService {
         List<Point> points = new ArrayList<Point>();
         try {
             builder = factory.newDocumentBuilder();
-            Document document = builder.parse(xmlFile);
+            Document document = builder.parse(xmlFile.getAbsolutePath());
             document.getDocumentElement().normalize();
-            // получаем узлы с именем Language
-            // теперь XML полностью загружен в память
-            // в виде объекта Document
+            //Get all nodes Point
             NodeList nodeList = document.getElementsByTagName("point");
-
-            // создадим из него список объектов Point
-
             for (int i = 0; i < nodeList.getLength(); i++) {
                 points.add(getPoint(nodeList.item(i)));
             }

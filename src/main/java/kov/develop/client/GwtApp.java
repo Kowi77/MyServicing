@@ -94,6 +94,25 @@ public class GwtApp implements EntryPoint {
         return dataProvider;
     }
 
+    //Fill table with dynamic loading data by Type and Country and Sity
+    private ListDataProvider<PointResult> fillTableByTypeAndCountryAndSity(String type, String country, String sity, ListDataProvider<PointResult> dataProvider) {
+        this.gwtAppService.getAllPointsByTypeAndCountryAndSity(type, country, sity, new AsyncCallback<List<PointResult>>() {
+            @Override
+            public void onFailure(Throwable throwable) {
+                GWT.log("Ошибка при загрузке списка", throwable);
+            }
+
+            @Override
+            public void onSuccess(List<PointResult> points) {
+                filteredList = new ArrayList<>(points);
+                dataProvider.getList().addAll(points);
+                refreshChoicePanel(filteredList);
+            }
+        });
+        return dataProvider;
+    }
+
+
 
 
     /**

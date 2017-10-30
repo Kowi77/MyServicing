@@ -27,8 +27,8 @@ public class GwtAppServiceImpl extends RemoteServiceServlet implements GwtAppSer
         this.repository = new PointRepository();
         PointRepository.readAllFromXml("E:\\Java\\Servicing\\src\\main\\resources\\point.xml");
         lastModified = new File("E:\\Java\\Servicing\\src\\main\\resources\\point.xml").lastModified();
-        loader.setDaemon(true);
-        loader.start();
+        /*loader.setDaemon(true);
+        loader.start();*/
     }
 
 
@@ -44,28 +44,23 @@ public class GwtAppServiceImpl extends RemoteServiceServlet implements GwtAppSer
         return repository.getAllPointsByTypeAndCountry(type.equals("")? null : PointType.valueOf(type), country).stream().map(p -> new PointResult(p)).collect(Collectors.toList());
     }
 
+    public List<PointResult> getAllPointsByTypeAndCountryAndSity(String type, String country, String sity) {
+        return repository.getAllPointsByTypeAndCountryAndSity(type.equals("")? null : PointType.valueOf(type), country, sity).stream().map(p -> new PointResult(p)).collect(Collectors.toList());
+    }
+
     public PointResult getPoint(int id) {
         return new PointResult(repository.getPoint(id));
     }
 
-    public PointResult gwtAppCallServer(Point point) throws IllegalArgumentException {
-        if (!FieldValidator.isValidData(point.getName())) {
-            throw new IllegalArgumentException("Имя должно быть больше трех символов");
-        }
-
-        PointResult pointResult = new PointResult(point);
-        return pointResult;
-    }
-
-    Thread loader = new Thread(new Runnable() {
+    /*Thread loader = new Thread(new Runnable() {
         @Override
         public void run() {
             while (true) {
-                if (new File("E:\\Java\\Servicing\\src\\main\\resources\\point.xml").lastModified() > lastModified) {
-                    PointRepository.readAllFromXml("E:\\Java\\Servicing\\src\\main\\resources\\point.xml");
-                    lastModified = new File("E:\\Java\\Servicing\\src\\main\\resources\\point.xml").lastModified();
+                if (new File("classpath:point.xml").lastModified() > lastModified) {
+                    PointRepository.readAllFromXml("classpath:point.xml");
+                    lastModified = new File("classpath:point.xml").lastModified();
                 }
-                System.out.println(new File("E:\\Java\\Servicing\\src\\main\\resources\\point.xml").lastModified());
+                System.out.println(new File("classpath:point.xml").lastModified());
                 try {
                     Thread.sleep(10000);
                 } catch (InterruptedException e) {
@@ -73,5 +68,5 @@ public class GwtAppServiceImpl extends RemoteServiceServlet implements GwtAppSer
                 }
             }
         }
-    });
+    });*/
 }
